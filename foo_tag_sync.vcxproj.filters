@@ -27,7 +27,7 @@
     <ClCompile Include="preferences.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="init.cpp">
+    <ClCompile Include="init_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
