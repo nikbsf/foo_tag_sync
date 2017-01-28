@@ -95,6 +95,7 @@
   <ItemGroup>
     <ClCompile Include="contextmenu.cpp" />
     <ClCompile Include="init_handler.cpp" />
+    <ClCompile Include="key_provider.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -103,6 +104,7 @@
     <ClCompile Include="preferences.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="key_provider.h" />
     <ClInclude Include="shared.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
