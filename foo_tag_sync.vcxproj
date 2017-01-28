@@ -94,6 +94,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="contextmenu.cpp" />
+    <ClCompile Include="edit_handler.cpp" />
     <ClCompile Include="init_handler.cpp" />
     <ClCompile Include="key_provider.cpp" />
     <ClCompile Include="main.cpp" />

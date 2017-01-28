@@ -27,6 +27,9 @@
     <ClCompile Include="preferences.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="edit_handler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="init_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
