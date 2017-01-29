@@ -103,11 +103,13 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="preferences.cpp" />
+    <ClCompile Include="tag_extractor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="key_provider.h" />
     <ClInclude Include="shared.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="tag_extractor.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

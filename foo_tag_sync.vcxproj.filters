@@ -36,6 +36,9 @@
     <ClCompile Include="key_provider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tag_extractor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -45,6 +48,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="key_provider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tag_extractor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
