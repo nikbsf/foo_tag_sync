@@ -57,6 +57,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\crc32c.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tag_exporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -81,6 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="leveldb_tag_storage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tag_exporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
