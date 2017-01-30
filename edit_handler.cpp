@@ -10,7 +10,7 @@ public:
 	}
 
 	void on_edited(metadb_handle_list_cref items, t_infosref before, t_infosref after) override {
-		tag_exporter_service->export_tags(items, after);
+		tag_exporter_service->export_tags(items, &after);
 	}
 };
 

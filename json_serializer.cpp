@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "shared.h"
 #include "json_serializer.h"
 
 pfc::string8 json_serializer::serialize(pfc::string8 key, tags_list_t item_tags_data) {

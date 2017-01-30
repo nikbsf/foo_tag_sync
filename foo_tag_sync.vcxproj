@@ -104,7 +104,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="contextmenu.cpp" />
+    <ClCompile Include="contextmenu_provider.cpp" />
     <ClCompile Include="edit_handler.cpp" />
     <ClCompile Include="init_handler.cpp" />
     <ClCompile Include="json_serializer.cpp" />
