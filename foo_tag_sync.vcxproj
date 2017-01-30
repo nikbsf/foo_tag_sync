@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\LevelDB.1.16.0.5\build\native\LevelDB.props" Condition="Exists('packages\LevelDB.1.16.0.5\build\native\LevelDB.props')" />
+  <Import Project="packages\Snappy.1.1.1.7\build\native\Snappy.props" Condition="Exists('packages\Snappy.1.1.1.7\build\native\Snappy.props')" />
+  <Import Project="packages\Crc32C.1.0.4\build\native\Crc32C.props" Condition="Exists('packages\Crc32C.1.0.4\build\native\Crc32C.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -44,14 +47,20 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\foobar2000\components</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\foobar2000\components</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;FOO_INPUT_RAW_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -68,6 +77,8 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>../shared/shared.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkStatus>true</LinkStatus>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -96,6 +107,7 @@
     <ClCompile Include="contextmenu.cpp" />
     <ClCompile Include="edit_handler.cpp" />
     <ClCompile Include="init_handler.cpp" />
+    <ClCompile Include="json_serializer.cpp" />
     <ClCompile Include="key_provider.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PCH.cpp">
@@ -103,12 +115,18 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="preferences.cpp" />
+    <ClCompile Include="lmdb_tag_storage.cpp" />
+    <ClCompile Include="leveldb_tag_storage.cpp" />
     <ClCompile Include="tag_extractor.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="json_serializer.h" />
     <ClInclude Include="key_provider.h" />
+    <ClInclude Include="lmdb_tag_storage.h" />
+    <ClInclude Include="leveldb_tag_storage.h" />
     <ClInclude Include="shared.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="tag_storage.h" />
     <ClInclude Include="tag_extractor.h" />
   </ItemGroup>
   <ItemGroup>
@@ -135,11 +153,16 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\wtl.9.1\build\native\wtl.targets" Condition="Exists('packages\wtl.9.1\build\native\wtl.targets')" />
+    <Import Project="packages\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets" Condition="Exists('packages\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('packages\wtl.9.1\build\native\wtl.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\wtl.9.1\build\native\wtl.targets'))" />
+    <Error Condition="!Exists('packages\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets'))" />
+    <Error Condition="!Exists('packages\Crc32C.1.0.4\build\native\Crc32C.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Crc32C.1.0.4\build\native\Crc32C.props'))" />
+    <Error Condition="!Exists('packages\Snappy.1.1.1.7\build\native\Snappy.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Snappy.1.1.1.7\build\native\Snappy.props'))" />
+    <Error Condition="!Exists('packages\LevelDB.1.16.0.5\build\native\LevelDB.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\LevelDB.1.16.0.5\build\native\LevelDB.props'))" />
   </Target>
 </Project>

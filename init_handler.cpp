@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 #include "shared.h"
 
 extern advconfig_string_factory cfg_key_format;
@@ -11,10 +12,6 @@ public:
 			return;
 
 		console::print(COMPONENT_NAME ": on_init()");
-
-		pfc::string8 key;
-		cfg_key_format.get(key);
-		console::formatter() << "key: " << key;
 	}
 };
 
