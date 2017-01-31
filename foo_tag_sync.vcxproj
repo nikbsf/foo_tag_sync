@@ -156,6 +156,7 @@
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\wtl.9.1\build\native\wtl.targets" Condition="Exists('packages\wtl.9.1\build\native\wtl.targets')" />
     <Import Project="packages\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets" Condition="Exists('packages\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets')" />
+    <Import Project="packages\rapidjson.1.0.2\build\native\rapidjson.targets" Condition="Exists('packages\rapidjson.1.0.2\build\native\rapidjson.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -166,5 +167,6 @@
     <Error Condition="!Exists('packages\Crc32C.1.0.4\build\native\Crc32C.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Crc32C.1.0.4\build\native\Crc32C.props'))" />
     <Error Condition="!Exists('packages\Snappy.1.1.1.7\build\native\Snappy.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Snappy.1.1.1.7\build\native\Snappy.props'))" />
     <Error Condition="!Exists('packages\LevelDB.1.16.0.5\build\native\LevelDB.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\LevelDB.1.16.0.5\build\native\LevelDB.props'))" />
+    <Error Condition="!Exists('packages\rapidjson.1.0.2\build\native\rapidjson.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\rapidjson.1.0.2\build\native\rapidjson.targets'))" />
   </Target>
 </Project>
