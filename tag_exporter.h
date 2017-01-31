@@ -15,6 +15,8 @@ class tag_exporter : public service_base {
 	service_ptr_t<tag_storage> tag_storage_service;
 	service_ptr_t<json_serializer> json_serializer_service;
 
+	bool is_empty(const tags_list_t& tags);
+
 public:
 	tag_exporter() : key_provider_service(new service_impl_t<key_provider>()),
 	                 tag_extractor_service(new service_impl_t<tag_extractor>()),
