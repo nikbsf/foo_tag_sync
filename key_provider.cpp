@@ -3,7 +3,7 @@
 #include "shared.h"
 #include "key_provider.h"
 
-extern advconfig_string_factory cfg_key_format;
+extern advconfig_string_factory_MT cfg_key_format;
 
 pfc::string8 key_provider::get_key(metadb_handle_ptr item) {
 	pfc::string8 result;

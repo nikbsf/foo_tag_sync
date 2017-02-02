@@ -3,7 +3,7 @@
 #include "lmdb++.h"
 #include "lmdb_tag_storage.h"
 
-void lmdb_tag_storage::save_tags(serialized_tags_dict_t serialized_tags_dict) {
+void lmdb_tag_storage::save(const serialized_tags_dict_t& serialized_tags_dict) {
 	auto env = lmdb::env::create();
 	env.set_flags(MDB_CREATE);	
 	try {		
@@ -19,7 +19,7 @@ void lmdb_tag_storage::save_tags(serialized_tags_dict_t serialized_tags_dict) {
 	for (auto it = serialized_tags_dict.begin(); it != serialized_tags_dict.end(); ++it) {
 		auto key = it->first;
 		auto serialized_tags = it->second;
-		dbi.put(wtxn, key.get_ptr(), serialized_tags.get_ptr());
+		dbi.put(wtxn, key, serialized_tags);
 	}		
 	wtxn.commit();
 }

@@ -8,5 +8,5 @@ static const GUID guid_cfg_synchronized_tags = { 0x9cc0d43c, 0x1d86, 0x414d,{ 0x
 
 
 static advconfig_branch_factory g_advconfigBranch(COMPONENT_TITLE, guid_advconfig_branch, advconfig_branch::guid_branch_tagging, 0);
-advconfig_string_factory cfg_key_format("Key format", guid_cfg_key_format, guid_advconfig_branch, 0, "");
-advconfig_string_factory cfg_synchronized_tags("Synchronized tags", guid_cfg_synchronized_tags, guid_advconfig_branch, 0, "");
+advconfig_string_factory_MT cfg_key_format("Key format", guid_cfg_key_format, guid_advconfig_branch, 0, "");
+advconfig_string_factory_MT cfg_synchronized_tags("Synchronized tags", guid_cfg_synchronized_tags, guid_advconfig_branch, 0, "");
