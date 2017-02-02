@@ -28,12 +28,5 @@ public:
 
 	void fetch();
 
-	bool is_actual(pfc::string8 key, const file_info* info) {
-		if (m_fetched_tags->size() == 0)
-			return true;
-
-		auto tags_data = tag_extractor_service->get_tags_data(info);
-		auto serialized_data = json_serializer_service->serialize(key, tags_data);
-		return serialized_data == (*m_fetched_tags)[key.get_ptr()];
-	}
+	bool is_actual(pfc::string8 key, const file_info* info);
 };

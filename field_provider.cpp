@@ -11,7 +11,7 @@ class field_provider : public metadb_display_field_provider {
 	bool try_get_actual(metadb_handle* handle, bool& result) {
 		auto key = key_provider_service->get_key(handle);
 		auto file_info = &handle->get_info_ref()->info();
-		if (tag_extractor_service->is_empty(file_info))
+		if (!tag_extractor_service->is_exportable(file_info) || tag_extractor_service->is_empty(file_info))
 			return false;
 
 		result = g_tag_importer->is_actual(key, file_info);

@@ -13,7 +13,7 @@ void tag_exporter::export_tags(metadb_handle_list_cref items, const pfc::list_ba
 		auto item_metadb_handle = items[i];
 		auto file_info = file_infos != NULL ? (*file_infos)[i] : &items[i]->get_info_ref()->info();
 
-		if (tag_extractor_service->is_empty(file_info))
+		if (!tag_extractor_service->is_exportable(file_info) || tag_extractor_service->is_empty(file_info))
 			continue;
 
 		auto key = key_provider_service->get_key(item_metadb_handle);
