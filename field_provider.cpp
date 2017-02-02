@@ -43,11 +43,11 @@ public:
 	}
 
 	bool process_field(t_uint32 index, metadb_handle* handle, titleformat_text_out* out) override {
-		auto actual = false;
+		auto actual = true;
 		switch (index) {
 			case field_actual:
 				if (try_get_actual(handle, actual)) {
-					out->write_int(titleformat_inputtypes::meta, actual);
+					out->write_int(titleformat_inputtypes::meta, actual ? 1 : -1);
 					return true;
 				}
 				return false;
