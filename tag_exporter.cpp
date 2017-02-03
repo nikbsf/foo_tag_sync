@@ -6,7 +6,7 @@
 void tag_exporter::export_tags(metadb_handle_list_cref items, const pfc::list_base_const_t<const file_info*>* file_infos) {
 	serialized_tags_dict_t serialized_tags;
 
-	console::timer_scope timer("export ");
+	console::timer_scope timer(COMPONENT_NAME": export: ");
 
 	auto exported_items_count = 0;
 	for (auto i = 0; i < items.get_count(); ++i) {
@@ -22,7 +22,9 @@ void tag_exporter::export_tags(metadb_handle_list_cref items, const pfc::list_ba
 		serialized_tags[key.get_ptr()] = json_serializer_service->serialize(key, tags);
 		++exported_items_count;
 	}
-	tag_storage_service->save(serialized_tags);
 
-	console::printf(COMPONENT_NAME ": exported %d of %d", exported_items_count, items.get_count()); //todo component print
+	fts_try([&] {
+		tag_storage_service->save(serialized_tags);
+		console::printf(COMPONENT_NAME": exported %d of %d", exported_items_count, items.get_count());
+	});	
 }

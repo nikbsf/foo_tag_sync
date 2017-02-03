@@ -12,7 +12,8 @@ leveldb::DB* leveldb_tag_storage::get_db_connection() {
 	options.compression = leveldb::kNoCompression;
 
 	auto status = leveldb::DB::Open(options, "c:\\xxx_leveldb", &db);
-	// todo check and throw
+	if (!status.ok())
+		throw fts_exception(status.ToString());
 
 	return db;
 }

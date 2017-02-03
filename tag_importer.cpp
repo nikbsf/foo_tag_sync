@@ -4,11 +4,12 @@
 
 
 void tag_importer::fetch() {
-	console::timer_scope timer("fetch ");
+	console::timer_scope timer(COMPONENT_NAME": fetch: ");
 
-	tag_storage_service->fetch(m_fetched_tags.get());
-
-	console::printf("items count: %d", m_fetched_tags->size());
+	fts_try([&] {
+		tag_storage_service->fetch(m_fetched_tags.get());
+		console::printf(COMPONENT_NAME": items count: %d", m_fetched_tags->size());
+	});	
 }
 
 bool tag_importer::is_actual(pfc::string8 key, const file_info* info) {
