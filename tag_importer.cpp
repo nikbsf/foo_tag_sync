@@ -24,4 +24,9 @@ tag_importer::status tag_importer::get_status(pfc::string8 key, const file_info*
 	return serialized_data == (*m_fetched_tags)[key.get_ptr()] ? status::actual : status::not_actual;
 }
 
+void tag_importer::invalidate(const serialized_tags_dict_t& serialized_tags_dict) {
+	for (auto it = serialized_tags_dict.begin(); it != serialized_tags_dict.end(); ++it)
+		m_fetched_tags->erase(it->first);
+}
+
 service_ptr_t<tag_importer> g_tag_importer(new service_impl_t<tag_importer>());

@@ -36,4 +36,6 @@ public:
 	void fetch();
 
 	tag_importer::status get_status(pfc::string8 key, const file_info* info) const;
+
+	void invalidate(const serialized_tags_dict_t& serialized_tags_dict);
 };
