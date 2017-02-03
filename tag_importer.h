@@ -19,6 +19,13 @@ class tag_importer : public service_base {
 	std::shared_ptr<serialized_tags_dict_t> m_fetched_tags;
 
 public:
+
+	enum status {
+		actual = 1,
+		not_actual,
+		not_exported
+	};
+
 	tag_importer() : key_provider_service(new service_impl_t<key_provider>()),
 	                 tag_extractor_service(new service_impl_t<tag_extractor>()),
 	                 tag_storage_service(new service_impl_t<t_tag_storage>()),
@@ -28,5 +35,5 @@ public:
 
 	void fetch();
 
-	bool is_actual(pfc::string8 key, const file_info* info);
+	tag_importer::status get_status(pfc::string8 key, const file_info* info) const;
 };

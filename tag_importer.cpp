@@ -12,13 +12,16 @@ void tag_importer::fetch() {
 	});	
 }
 
-bool tag_importer::is_actual(pfc::string8 key, const file_info* info) {
+tag_importer::status tag_importer::get_status(pfc::string8 key, const file_info* info) const {
 	if (m_fetched_tags->size() == 0)
-		return true;
+		return status::actual;
+
+	if (m_fetched_tags->find(key.get_ptr()) == m_fetched_tags->end())
+		return status::not_exported;
 
 	auto tags_data = tag_extractor_service->get_tags_data(info);
 	auto serialized_data = json_serializer_service->serialize(key, tags_data);
-	return serialized_data == (*m_fetched_tags)[key.get_ptr()];
+	return serialized_data == (*m_fetched_tags)[key.get_ptr()] ? status::actual : status::not_actual;
 }
 
 service_ptr_t<tag_importer> g_tag_importer(new service_impl_t<tag_importer>());
