@@ -18,17 +18,19 @@ leveldb::DB* leveldb_tag_storage::get_db_connection() {
 	return db;
 }
 
-void leveldb_tag_storage::fetch(serialized_tags_dict_t* out) {
+serialized_tags_dict_t* leveldb_tag_storage::fetch(serialized_tags_dict_t& existing) {
 	std::shared_ptr<leveldb::DB> db(get_db_connection());
+	auto result = new serialized_tags_dict_t();
 
 	std::shared_ptr<leveldb::Iterator> it(db->NewIterator(leveldb::ReadOptions()));
 	for (it->SeekToFirst(); it->Valid(); it->Next()) {
 		auto key = it->key().ToString();
 		auto value = it->value().ToString();
 
-		if ((*out)[key] != value)
-			(*out)[key] = value;
+		if (existing[key] != value)
+			(*result)[key] = value;
 	}
+	return result;
 }
 
 void leveldb_tag_storage::save(const serialized_tags_dict_t& serialized_tags_dict) {

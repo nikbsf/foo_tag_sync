@@ -7,9 +7,23 @@ void tag_importer::fetch() {
 	console::timer_scope timer(COMPONENT_NAME": fetch: ");
 
 	fts_try([&] {
-		tag_storage_service->fetch(m_fetched_tags.get());
+		std::shared_ptr<serialized_tags_dict_t> fetched_tags(tag_storage_service->fetch(*m_fetched_tags));
+
+		for (auto it = fetched_tags->begin(); it != fetched_tags->end(); ++it)
+			(*m_fetched_tags)[it->first] = it->second;
+
+		// This is a hack, refreshing all items instead of using metadb_io_callback breaks the API contract.
+		// It's still quite fast though, and the fetch operation is not designed to be performed too often.
+		if (m_fetched_tags->size()) {
+			console::timer_scope timer(COMPONENT_NAME": refresh: ");
+
+			pfc::list_t<metadb_handle_ptr> handles;
+			static_api_ptr_t<playlist_manager>()->get_all_items(handles);
+			static_api_ptr_t<metadb_io>()->dispatch_refresh(handles);
+		}
+
 		console::printf(COMPONENT_NAME": items count: %d", m_fetched_tags->size());
-	});	
+	});
 }
 
 tag_importer::status tag_importer::get_status(pfc::string8 key, const file_info* info) const {
