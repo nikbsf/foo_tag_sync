@@ -5,13 +5,19 @@
 
 #include "leveldb_tag_storage.h"
 
+extern advconfig_string_factory_MT cfg_storage_path;
+
 leveldb::DB* leveldb_tag_storage::get_db_connection() {
 	leveldb::DB* db;
 	leveldb::Options options;
 	options.create_if_missing = true;
 	options.compression = leveldb::kNoCompression;
 
-	auto status = leveldb::DB::Open(options, "c:\\xxx_leveldb", &db);
+	auto storage_path = get_setting(cfg_storage_path);
+	if (storage_path.is_empty())
+		throw fts_exception("Storage path not set");
+
+	auto status = leveldb::DB::Open(options, storage_path.get_ptr(), &db);
 	if (!status.ok())
 		throw fts_exception(status.ToString());
 
