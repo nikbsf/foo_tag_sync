@@ -12,6 +12,8 @@ void tag_fetcher::fetch() {
 		for (auto it = fetched_tags->begin(); it != fetched_tags->end(); ++it)
 			(*m_fetched_tags)[it->first] = it->second;
 
+		m_exported_keys->clear();
+
 		// This is a hack, refreshing all items instead of using metadb_io_callback breaks the API contract.
 		// It's still quite fast though, and the fetch operation is not designed to be performed too often.
 		if (m_fetched_tags->size()) {
@@ -26,8 +28,7 @@ void tag_fetcher::fetch() {
 	});
 }
 
-bool tag_fetcher::get_status(metadb_handle* handle, tag_fetcher::status& result) const {
-	auto key = key_provider_service->get_key(handle);
+bool tag_fetcher::get_status(metadb_handle* handle, tag_fetcher::status& result) const {	
 	auto info = &handle->get_info_ref()->info();
 
 	if (!tag_extractor_service->is_exportable(info))
@@ -35,6 +36,12 @@ bool tag_fetcher::get_status(metadb_handle* handle, tag_fetcher::status& result)
 
 	if (m_fetched_tags->size() == 0)
 		return false;
+
+	auto key = key_provider_service->get_key(handle);
+	if (m_exported_keys->find(key.c_str()) != m_exported_keys->end()) {
+		result = status::exported;
+		return true;
+	}
 
 	bool is_fetched = m_fetched_tags->find(key.c_str()) != m_fetched_tags->end();
 	bool is_empty = tag_extractor_service->is_empty(info);
@@ -62,9 +69,9 @@ std::string tag_fetcher::get_data(pfc::string8 key) {
 	return (*m_fetched_tags)[key.c_str()];
 }
 
-void tag_fetcher::invalidate(const serialized_tags_dict_t& serialized_tags_dict) {
+void tag_fetcher::notify_export(const serialized_tags_dict_t& serialized_tags_dict) {
 	for (auto it = serialized_tags_dict.begin(); it != serialized_tags_dict.end(); ++it)
-		m_fetched_tags->erase(it->first);
+		m_exported_keys->insert(it->first.c_str());
 }
 
 service_ptr_t<tag_fetcher> g_tag_fetcher(new service_impl_t<tag_fetcher>());

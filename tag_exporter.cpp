@@ -27,7 +27,8 @@ void tag_exporter::export_tags(metadb_handle_list_cref items, const pfc::list_ba
 
 	fts_try([&] {
 		tag_storage_service->save(serialized_tags);
-		//g_tag_fetcher->invalidate(serialized_tags);
+		g_tag_fetcher->notify_export(serialized_tags);
+		static_api_ptr_t<metadb_io>()->dispatch_refresh(items);
 		console::printf(COMPONENT_NAME": exported %d of %d", exported_items_count, items.get_count());
 	});	
 }

@@ -11,6 +11,8 @@ typedef leveldb_tag_storage t_tag_storage;
 
 class tag_fetcher : public service_base {
 	std::shared_ptr<serialized_tags_dict_t> m_fetched_tags;
+	std::shared_ptr<std::set<std::string>> m_exported_keys;
+
 	service_ptr_t<tag_storage> tag_storage_service;
 	service_ptr_t<key_provider> key_provider_service;
 	service_ptr_t<tag_extractor> tag_extractor_service;
@@ -20,10 +22,12 @@ public:
 	enum status {
 		actual = 1,
 		not_actual,
-		not_exported
+		not_exported,
+		exported
 	};
 
 	tag_fetcher() : m_fetched_tags(new serialized_tags_dict_t()),
+	                m_exported_keys(new std::set<std::string>()),
 	                key_provider_service(new service_impl_t<key_provider>()),
 	                tag_extractor_service(new service_impl_t<tag_extractor>()),
 	                tag_storage_service(new service_impl_t<t_tag_storage>()),
@@ -38,5 +42,5 @@ public:
 
 	bool get_status(metadb_handle* handle, tag_fetcher::status& result) const;
 
-	void invalidate(const serialized_tags_dict_t& serialized_tags_dict);
+	void notify_export(const serialized_tags_dict_t& serialized_tags_dict);
 };
