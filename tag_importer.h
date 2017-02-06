@@ -37,7 +37,7 @@ public:
 
 	void import_tags(metadb_handle_list_cref items);
 
-	tag_importer::status get_status(pfc::string8 key, const file_info* info) const;
+	bool get_status(metadb_handle* handle, tag_importer::status& result) const;
 
 	void invalidate(const serialized_tags_dict_t& serialized_tags_dict);
 };

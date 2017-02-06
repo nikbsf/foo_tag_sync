@@ -55,16 +55,31 @@ void tag_importer::import_tags(metadb_handle_list_cref items) {
 	                                                           NULL);
 }
 
-tag_importer::status tag_importer::get_status(pfc::string8 key, const file_info* info) const {
+bool tag_importer::get_status(metadb_handle* handle, tag_importer::status& result) const {
+	auto key = key_provider_service->get_key(handle);
+	auto info = &handle->get_info_ref()->info();
+
+	if (!tag_extractor_service->is_exportable(info))
+		return false;
+
 	if (m_fetched_tags->size() == 0)
-		return status::actual;
+		return false;
 
-	if (m_fetched_tags->find(key.get_ptr()) == m_fetched_tags->end())
-		return status::not_exported;
+	bool is_fetched = m_fetched_tags->find(key.c_str()) != m_fetched_tags->end();
+	bool is_empty = tag_extractor_service->is_empty(info);
 
-	auto tags_data = tag_extractor_service->get_tags_data(info);
-	auto serialized_data = json_serializer_service->serialize(key, tags_data);
-	return serialized_data == (*m_fetched_tags)[key.get_ptr()] ? status::actual : status::not_actual;
+	if (!is_fetched) {
+		if (is_empty)
+			return false;
+		else
+			result = status::not_exported;
+	} else {
+		// todo comparer
+		auto tags_data = tag_extractor_service->get_tags_data(info);
+		auto serialized_data = json_serializer_service->serialize(key, tags_data);
+		result = serialized_data == (*m_fetched_tags)[key.get_ptr()] ? status::actual : status::not_actual;
+	}
+	return true;
 }
 
 void tag_importer::invalidate(const serialized_tags_dict_t& serialized_tags_dict) {
