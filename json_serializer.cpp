@@ -23,3 +23,14 @@ std::string json_serializer::serialize(pfc::string8 key, const tags_data_t& tags
 	document.Accept(writer);
 	return buffer.GetString();
 }
+
+tags_data_t json_serializer::deserialize(std::string serialized_data) {
+	Document document;
+	document.Parse(serialized_data.c_str());
+
+	tags_data_t result;
+	for (auto it = document.MemberBegin(); it != document.MemberEnd(); ++it)
+		result.push_back(std::pair<pfc::string8, pfc::string8>(it->name.GetString(), it->value.GetString()));
+
+	return result;
+}

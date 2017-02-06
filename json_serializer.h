@@ -5,4 +5,5 @@
 class json_serializer : public service_base {
 public:
 	std::string serialize(pfc::string8 key, const tags_data_t& item_tags_data);
+	tags_data_t deserialize(std::string serialized_data);
 };
