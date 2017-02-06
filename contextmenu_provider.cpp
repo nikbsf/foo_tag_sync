@@ -3,13 +3,13 @@
 #include "tag_exporter.h"
 #include "tag_importer.h"
 
-extern service_ptr_t<tag_importer> g_tag_importer;
-
 class contextmenu_provider : public contextmenu_item_simple {
 	service_ptr_t<tag_exporter> tag_exporter_service;
+	service_ptr_t<tag_importer> tag_importer_service;
 
 protected:
-	contextmenu_provider() : tag_exporter_service(new service_impl_t<tag_exporter>()) {
+	contextmenu_provider() : tag_exporter_service(new service_impl_t<tag_exporter>()),
+	                         tag_importer_service(new service_impl_t<tag_importer>()) {
 	}
 
 public:
@@ -38,7 +38,7 @@ public:
 				tag_exporter_service->export_tags(p_data);
 				break;
 			case cmd_import:
-				g_tag_importer->import_tags(p_data);
+				tag_importer_service->import_tags(p_data);
 				break;
 			default:
 				uBugCheck();

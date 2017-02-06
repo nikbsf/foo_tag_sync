@@ -3,7 +3,7 @@
 #include "tag_exporter.h"
 #include "tag_importer.h"
 
-extern service_ptr_t<tag_importer> g_tag_importer;
+extern service_ptr_t<tag_fetcher> g_tag_fetcher;
 
 void tag_exporter::export_tags(metadb_handle_list_cref items, const pfc::list_base_const_t<const file_info*>* file_infos) {
 	serialized_tags_dict_t serialized_tags;
@@ -27,7 +27,7 @@ void tag_exporter::export_tags(metadb_handle_list_cref items, const pfc::list_ba
 
 	fts_try([&] {
 		tag_storage_service->save(serialized_tags);
-		g_tag_importer->invalidate(serialized_tags);
+		//g_tag_fetcher->invalidate(serialized_tags);
 		console::printf(COMPONENT_NAME": exported %d of %d", exported_items_count, items.get_count());
 	});	
 }

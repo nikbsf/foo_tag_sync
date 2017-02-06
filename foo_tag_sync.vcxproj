@@ -120,6 +120,7 @@
     <ClCompile Include="leveldb_tag_storage.cpp" />
     <ClCompile Include="tag_exporter.cpp" />
     <ClCompile Include="tag_extractor.cpp" />
+    <ClCompile Include="tag_fetcher.cpp" />
     <ClCompile Include="tag_importer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +132,7 @@
     <ClInclude Include="shared.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="tag_exporter.h" />
+    <ClInclude Include="tag_fetcher.h" />
     <ClInclude Include="tag_importer.h" />
     <ClInclude Include="tag_storage.h" />
     <ClInclude Include="tag_extractor.h" />

@@ -4,7 +4,7 @@
 
 #define FIELD_NAME "foo_tag_sync_status";
 
-extern service_ptr_t<tag_importer> g_tag_importer;
+extern service_ptr_t<tag_fetcher> g_tag_fetcher;
 
 class field_provider : public metadb_display_field_provider {
 	service_ptr_t<key_provider> key_provider_service;
@@ -34,10 +34,10 @@ public:
 	}
 
 	bool process_field(t_uint32 index, metadb_handle* handle, titleformat_text_out* out) override {
-		tag_importer::status status;
+		tag_fetcher::status status;
 		switch (index) {
 			case field_status:
-				if (g_tag_importer->get_status(handle, status)) {
+				if (g_tag_fetcher->get_status(handle, status)) {
 					out->write_int(titleformat_inputtypes::meta, status);
 					return true;
 				}
