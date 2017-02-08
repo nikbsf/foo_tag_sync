@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "tag_importer.h"
+#include "tag_fetcher.h"
 
 extern service_ptr_t<tag_fetcher> g_tag_fetcher;
 extern advconfig_integer_factory cfg_fetch_interval_seconds;

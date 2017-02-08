@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "tag_importer.h"
+#include "tag_fetcher.h"
 
 #define FIELD_NAME "foo_tag_sync_status";
 

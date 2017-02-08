@@ -5,19 +5,16 @@
 #include "json_serializer.h"
 #include "key_provider.h"
 #include "tag_extractor.h"
-#include "tag_fetcher.h"
 
 
 class tag_importer : public service_base {
 	service_ptr_t<key_provider> key_provider_service;
 	service_ptr_t<tag_extractor> tag_extractor_service;
-	service_ptr_t<tag_fetcher> tag_fetcher_service;
 	service_ptr_t<json_serializer> json_serializer_service;
 
 public:
 	tag_importer() : key_provider_service(new service_impl_t<key_provider>()),
 	                 tag_extractor_service(new service_impl_t<tag_extractor>()),
-	                 tag_fetcher_service(new service_impl_t<tag_fetcher>()),
 	                 json_serializer_service(new service_impl_t<json_serializer>()) {
 	}
 

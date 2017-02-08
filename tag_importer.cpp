@@ -1,6 +1,9 @@
 #include "stdafx.h"
 
 #include "tag_importer.h"
+#include "tag_fetcher.h"
+
+extern service_ptr_t<tag_fetcher> g_tag_fetcher;
 
 void tag_importer::import_tags(metadb_handle_list_cref items) {
 	pfc::list_t<file_info_impl> file_infos;
@@ -13,12 +16,12 @@ void tag_importer::import_tags(metadb_handle_list_cref items) {
 			continue;
 
 		auto key = key_provider_service->get_key(handle);
-		if (tag_fetcher_service->is_fetched(key)) {
+		if (g_tag_fetcher->is_fetched(key)) {
 			console::printf(COMPONENT_NAME": no data for key: %s", key.c_str());
 			continue;
 		}
 		else {
-			auto serialized_tags_data = tag_fetcher_service->get_data(key);
+			auto serialized_tags_data = g_tag_fetcher->get_data(key);
 			auto tags_data = json_serializer_service->deserialize(serialized_tags_data);
 			tag_extractor_service->set_tags_data(&info, tags_data);
 		}
