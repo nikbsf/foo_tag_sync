@@ -3,11 +3,13 @@
 #include "tag_fetcher.h"
 #include "leveldb_tag_storage.h"
 
+extern advconfig_checkbox_factory cfg_refresh_on_fetch;
+
 void tag_fetcher::fetch() {
 	pfc::hires_timer timer, refresh_timer;
 	fts_try([&] {
 			timer.start();
-			std::shared_ptr<serialized_tags_dict_t> fetched_tags(tag_storage_service->fetch(*m_fetched_tags));
+			std::shared_ptr<serialized_tags_dict_t> fetched_tags(tag_storage_service->fetch(*m_fetched_tags)); // todo asyncronous call
 
 			for (auto it = fetched_tags->begin(); it != fetched_tags->end(); ++it)
 				(*m_fetched_tags)[it->first] = it->second;
@@ -15,22 +17,29 @@ void tag_fetcher::fetch() {
 			m_exported_keys->clear();
 
 			auto fetch_time_str = timer.queryString(2);
+			pfc::string8 refresh_message;
 
-			// This is a hack, refreshing all items instead of using metadb_io_callback breaks the API contract.
-			// It's still quite fast though, and the fetch operation is not designed to be performed too often.
-			if (m_fetched_tags->size()) {
-				refresh_timer.start();
-
-				pfc::list_t<metadb_handle_ptr> handles;
-				static_api_ptr_t<playlist_manager>()->get_all_items(handles);
-				static_api_ptr_t<metadb_io>()->dispatch_refresh(handles);
+			if (cfg_refresh_on_fetch.get() == false)
+				refresh_message << "disabled";
+			else {
+				// This is a hack, refreshing all items instead of using metadb_io_callback breaks the API contract.
+				// It's still quite fast though, and the fetch operation is not designed to be performed too often.
+				if (!fetched_tags->size()) 
+					refresh_message << "not needed";
+				else {
+					refresh_timer.start();
+					pfc::list_t<metadb_handle_ptr> handles;
+					static_api_ptr_t<playlist_manager>()->get_all_items(handles);
+					static_api_ptr_t<metadb_io>()->dispatch_refresh(handles);
+					refresh_message << refresh_timer.queryString(2);
+				}
 			}
 
 			console::printf(COMPONENT_NAME": fetched: %d. cached: %d. fetch: %s. refresh: %s. total: %s",
 			                              fetched_tags->size(),
 			                              m_fetched_tags->size(),
 			                              fetch_time_str.c_str(),
-			                              refresh_timer.queryString(2).c_str(),
+			                              refresh_message.c_str(),
 			                              timer.queryString(2).c_str()
 			);
 		});
