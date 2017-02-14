@@ -1,21 +1,13 @@
 #include "stdafx.h"
 
-#include "tag_importer.h"
-#include "tag_fetcher.h"
+#include "service_container.h"
 
 #define FIELD_NAME "foo_tag_sync_status";
 
-extern service_ptr_t<tag_fetcher> g_tag_fetcher;
+extern service_ptr_t<service_container> g_service_container;
 
 class field_provider : public metadb_display_field_provider {
-	service_ptr_t<key_provider> key_provider_service;
-	service_ptr_t<tag_extractor> tag_extractor_service;
-
 public:
-	field_provider() : key_provider_service(new service_impl_t<key_provider>()),
-	                   tag_extractor_service(new service_impl_t<tag_extractor>()) {
-	}
-
 	enum {
 		field_status = 0,
 		field_total
@@ -38,7 +30,7 @@ public:
 		tag_fetcher::status status;
 		switch (index) {
 			case field_status:
-				if (g_tag_fetcher->get_status(handle, status)) {
+				if (g_service_container->get_tag_fetcher()->get_status(handle, status)) {
 					out->write_int(titleformat_inputtypes::meta, status);
 					return true;
 				}

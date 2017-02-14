@@ -1,14 +1,14 @@
 #include "stdafx.h"
 
-#include "tag_fetcher.h"
+#include "service_container.h"
 
-extern service_ptr_t<tag_fetcher> g_tag_fetcher;
+extern service_ptr_t<service_container> g_service_container;
 extern advconfig_integer_factory cfg_fetch_interval_seconds;
 
 class updates_check_timer : public system_time_callback_impl {
 public:
 	void on_time_changed(t_filetimestamp newVal) override {
-		g_tag_fetcher->fetch();
+		g_service_container->get_tag_fetcher()->fetch();
 	}
 };
 

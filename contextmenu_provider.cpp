@@ -1,19 +1,11 @@
 #include "stdafx.h"
 
-#include "tag_exporter.h"
-#include "tag_importer.h"
+#include "service_container.h"
+
+extern service_ptr_t<service_container> g_service_container;
 
 class contextmenu_provider : public contextmenu_item_simple {
-	service_ptr_t<tag_exporter> tag_exporter_service;
-	service_ptr_t<tag_importer> tag_importer_service;
-
-protected:
-	contextmenu_provider() : tag_exporter_service(new service_impl_t<tag_exporter>()),
-	                         tag_importer_service(new service_impl_t<tag_importer>()) {
-	}
-
 public:
-
 	enum {
 		cmd_export = 0,
 		cmd_import,
@@ -35,10 +27,10 @@ public:
 	void context_command(unsigned p_index, metadb_handle_list_cref p_data, const GUID& p_caller) {
 		switch (p_index) {
 			case cmd_export:
-				tag_exporter_service->export_tags(p_data);
+				g_service_container->get_tag_exporter()->export_tags(p_data);
 				break;
 			case cmd_import:
-				tag_importer_service->import_tags(p_data);
+				g_service_container->get_tag_importer()->import_tags(p_data);
 				break;
 			default:
 				uBugCheck();

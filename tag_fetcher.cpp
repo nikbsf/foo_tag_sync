@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "tag_fetcher.h"
-#include "leveldb_tag_storage.h"
 
 extern advconfig_checkbox_factory cfg_refresh_on_fetch;
 
@@ -90,5 +89,3 @@ void tag_fetcher::notify_export(const serialized_tags_dict_t& serialized_tags_di
 	for (auto it = serialized_tags_dict.begin(); it != serialized_tags_dict.end(); ++it)
 		m_exported_keys->insert(it->first.c_str());
 }
-
-service_ptr_t<tag_fetcher> g_tag_fetcher(new service_impl_t<tag_fetcher>());

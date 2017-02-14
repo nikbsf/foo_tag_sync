@@ -118,12 +118,14 @@
     <ClCompile Include="preferences.cpp" />
     <ClCompile Include="lmdb_tag_storage.cpp" />
     <ClCompile Include="leveldb_tag_storage.cpp" />
+    <ClCompile Include="service_container.cpp" />
     <ClCompile Include="tag_exporter.cpp" />
     <ClCompile Include="tag_extractor.cpp" />
     <ClCompile Include="tag_fetcher.cpp" />
     <ClCompile Include="tag_importer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="service_container.h" />
     <ClInclude Include="json_serializer.h" />
     <ClInclude Include="key_provider.h" />
     <ClInclude Include="lmdb++.h" />
