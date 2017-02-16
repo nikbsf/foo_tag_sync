@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "lmdb++.h"
+#include "lmdb/lmdb++.h"
 #include "lmdb_tag_storage.h"
 
 void lmdb_tag_storage::save(const serialized_tags_dict_t& serialized_tags_dict) {

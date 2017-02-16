@@ -104,18 +104,17 @@
     <ClInclude Include="tag_importer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lmdb++.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="tag_fetcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="service_container.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="lmdb\lmdb++.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="readme.txt" />
     <None Include="packages.config" />
   </ItemGroup>
 </Project>

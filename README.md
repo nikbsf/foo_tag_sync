@@ -1,0 +1,1 @@
+# foo_tag_sync - a foobar2000 component for synchronizing custom metadata with external key-value store.
