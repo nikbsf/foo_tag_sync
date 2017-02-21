@@ -2,6 +2,7 @@
 
 #include "service_container.h"
 #include "leveldb_tag_storage.h"
+#include "lmdb_tag_storage.h"
 
 service_ptr_t<service_container> g_service_container(new service_impl_single_t<service_container>());
 
