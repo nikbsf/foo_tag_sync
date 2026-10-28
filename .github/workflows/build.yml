@@ -8,9 +8,9 @@ on:
 
 jobs:
   build:
-    # windows-latest is a moving alias (now windows-2025-vs2026, which ships
-    # only VS2026 whose v143 toolset lacks ATL). windows-2025 has VS2022 17.x
-    # with a v143 toolset and a matching ATL component.
+    # windows-2025 (and the windows-latest alias) currently provision the
+    # windows-2025-vs2026 image: VS2026 only, whose default toolset is v145
+    # with a matching ATL component. We build with v145 everywhere.
     runs-on: windows-2025
     steps:
       - uses: actions/checkout@v4
@@ -20,23 +20,19 @@ jobs:
         shell: pwsh
         run: ./bootstrap.ps1
 
-      - name: Locate VS2022 toolchain
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      # Insurance against runner-images#9873-style drift (atlmfc missing from
+      # the default include path): cl.exe also honors INCLUDE/LIB env vars.
+      - name: Add atlmfc to INCLUDE/LIB
         shell: pwsh
         run: |
           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          $instances = & $vswhere -all -products * -format json | ConvertFrom-Json
-          $vs = $instances | Where-Object { $_.installationVersion -like '17.*' } | Select-Object -First 1
-          if (-not $vs) {
-            Write-Host "##[error]No Visual Studio 2022 instance found. Available instances:"
-            $instances | ForEach-Object { Write-Host "  $($_.installationVersion) $($_.installationPath)" }
-            throw "Visual Studio 2022 (17.x) not found on the image"
-          }
-          $vsPath = $vs.installationPath
-          "MSBUILD=$vsPath\MSBuild\Current\Bin\MSBuild.exe" >> $env:GITHUB_ENV
-          Write-Host "VS2022: $vsPath ($($vs.installationVersion))"
-          # Insurance against runner-images#9873 (atlmfc missing from the default
-          # include path): cl.exe also honors the INCLUDE/LIB environment variables.
-          $atlmfc = Get-ChildItem "$vsPath\VC\Tools\MSVC" -Directory |
+          $vs = & $vswhere -latest -property installationPath
+          if (-not $vs) { throw "No Visual Studio instance found on the image" }
+          Write-Host "Visual Studio: $vs"
+          $atlmfc = Get-ChildItem "$vs\VC\Tools\MSVC" -Directory |
                     Where-Object { Test-Path "$($_.FullName)\atlmfc\include\atlbase.h" }
           if ($atlmfc) {
             "INCLUDE=" + (($atlmfc | ForEach-Object { "$($_.FullName)\atlmfc\include" }) -join ';') >> $env:GITHUB_ENV
@@ -44,7 +40,10 @@ jobs:
             Write-Host "atlmfc: $(($atlmfc | ForEach-Object { $_.FullName }) -join ';')"
           }
           else {
-            Write-Host "##[warning]atlmfc not found under $vsPath\VC\Tools\MSVC"
+            $instances = & $vswhere -all -products * -format json | ConvertFrom-Json
+            Write-Host "##[error]atlmfc not found. Available instances:"
+            $instances | ForEach-Object { Write-Host "  $($_.installationVersion) $($_.installationPath)" }
+            throw "atlmfc not found under $vs\VC\Tools\MSVC - install the VC.ATL component"
           }
 
       - name: Restore NuGet packages
@@ -55,7 +54,7 @@ jobs:
       - name: Build (Release Win32)
         shell: pwsh
         working-directory: ${{ steps.bootstrap.outputs.build_dir }}
-        run: '& $env:MSBUILD foo_tag_sync.sln /p:Configuration=Release /p:Platform=x86 /m /nologo /v:m'
+        run: msbuild foo_tag_sync.sln /p:Configuration=Release /p:Platform=x86 /m /nologo /v:m
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

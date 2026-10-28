@@ -15,7 +15,7 @@
 #
 # The script unpacks the pinned SDK (vendor\SDK-2015-08-03.zip) into
 # <layoutRoot> (the parent of the directory containing this repository),
-# retargets the vintage SDK projects (v100/v120) to the v143 toolset, and
+# retargets the vintage SDK projects (v100/v120) to the v145 toolset, and
 # creates a junction when the repository was cloned outside the SDK tree.
 #
 # Usage:  .\bootstrap.ps1          # idempotent
@@ -35,7 +35,7 @@ $expectedHash = "ff1a23c4e9b96b5dc7135478281f029530d84d732c3cb5b39342237d0a9df25
 
 $layoutRoot = Split-Path (Split-Path $repoRoot)
 
-# Relative to $layoutRoot. Normalized to v143 after extraction.
+# Relative to $layoutRoot. Normalized to v145 after extraction.
 $sdkProjects = @(
     "pfc\pfc.vcxproj",
     "foobar2000\SDK\foobar2000_SDK.vcxproj",
@@ -92,12 +92,12 @@ else {
     Remove-Item $tempDir -Recurse -Force
 }
 
-Write-Host "Normalizing platform toolsets to v143 ..."
+Write-Host "Normalizing platform toolsets to v145 ..."
 foreach ($rel in $sdkProjects) {
     $path = Join-Path $layoutRoot $rel
     if (-not (Test-Path $path)) { throw "Missing SDK project: $path" }
     $text = [IO.File]::ReadAllText($path)
-    $patched = $text -replace "<PlatformToolset>v1[0-9][0-9]</PlatformToolset>", "<PlatformToolset>v143</PlatformToolset>"
+    $patched = $text -replace "<PlatformToolset>v1[0-9][0-9]</PlatformToolset>", "<PlatformToolset>v145</PlatformToolset>"
     if ($patched -ne $text) {
         [IO.File]::WriteAllText($path, $patched)
         Write-Host "  patched $rel"
