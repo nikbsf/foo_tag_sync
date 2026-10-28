@@ -17,24 +17,29 @@ jobs:
         shell: pwsh
         run: ./bootstrap.ps1
 
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
-
-      # Workaround for actions/runner-images#9873: the ATL headers exist on the
-      # image but are missing from the compiler's default include path.
-      - name: Add atlmfc to INCLUDE/LIB
+      # Pin the build to VS2022: v143 (14.4x) and its ATL are aligned there.
+      # vswhere -latest would pick VS2026, whose v143 toolset lacks atlmfc,
+      # breaking ATLHelpers with C1083 (see actions/runner-images#9873).
+      - name: Locate VS2022 toolchain
         shell: pwsh
         run: |
-          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
-          $dirs = Get-ChildItem "$vs\VC\Tools\MSVC" -Directory |
-                  Where-Object { Test-Path "$($_.FullName)\atlmfc\include\atlbase.h" }
-          if (-not $dirs) { throw "atlmfc not found under $vs\VC\Tools\MSVC - install the VC.ATL component" }
-          $inc = ($dirs | ForEach-Object { "$($_.FullName)\atlmfc\include" }) -join ';'
-          $lib = ($dirs | ForEach-Object { "$($_.FullName)\atlmfc\lib\x86" }) -join ';'
-          "INCLUDE=$env:INCLUDE;$inc" >> $env:GITHUB_ENV
-          "LIB=$env:LIB;$lib" >> $env:GITHUB_ENV
-          Write-Host "atlmfc include: $inc"
-          Write-Host "atlmfc lib: $lib"
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vs = & $vswhere -latest -version "[17.0,18.0)" -property installationPath
+          if (-not $vs) { throw "Visual Studio 2022 (17.x) not found on the image" }
+          "MSBUILD=$vs\MSBuild\Current\Bin\MSBuild.exe" >> $env:GITHUB_ENV
+          Write-Host "VS2022: $vs"
+          # Insurance against #9873 (atlmfc missing from the default include path):
+          # cl.exe also honors the INCLUDE/LIB environment variables.
+          $atlmfc = Get-ChildItem "$vs\VC\Tools\MSVC" -Directory |
+                    Where-Object { Test-Path "$($_.FullName)\atlmfc\include\atlbase.h" }
+          if ($atlmfc) {
+            "INCLUDE=" + (($atlmfc | ForEach-Object { "$($_.FullName)\atlmfc\include" }) -join ';') >> $env:GITHUB_ENV
+            "LIB="     + (($atlmfc | ForEach-Object { "$($_.FullName)\atlmfc\lib\x86" }) -join ';') >> $env:GITHUB_ENV
+            Write-Host "atlmfc: $(($atlmfc | ForEach-Object { $_.FullName }) -join ';')"
+          }
+          else {
+            Write-Host "##[warning]atlmfc not found under $vs\VC\Tools\MSVC"
+          }
 
       - name: Restore NuGet packages
         shell: pwsh
@@ -44,7 +49,7 @@ jobs:
       - name: Build (Release Win32)
         shell: pwsh
         working-directory: ${{ steps.bootstrap.outputs.build_dir }}
-        run: msbuild foo_tag_sync.sln /p:Configuration=Release /p:Platform=x86 /m /nologo /v:m
+        run: '& $env:MSBUILD foo_tag_sync.sln /p:Configuration=Release /p:Platform=x86 /m /nologo /v:m'
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
