@@ -23,29 +23,6 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
 
-      # Insurance against runner-images#9873-style drift (atlmfc missing from
-      # the default include path): cl.exe also honors INCLUDE/LIB env vars.
-      - name: Add atlmfc to INCLUDE/LIB
-        shell: pwsh
-        run: |
-          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          $vs = & $vswhere -latest -property installationPath
-          if (-not $vs) { throw "No Visual Studio instance found on the image" }
-          Write-Host "Visual Studio: $vs"
-          $atlmfc = Get-ChildItem "$vs\VC\Tools\MSVC" -Directory |
-                    Where-Object { Test-Path "$($_.FullName)\atlmfc\include\atlbase.h" }
-          if ($atlmfc) {
-            "INCLUDE=" + (($atlmfc | ForEach-Object { "$($_.FullName)\atlmfc\include" }) -join ';') >> $env:GITHUB_ENV
-            "LIB="     + (($atlmfc | ForEach-Object { "$($_.FullName)\atlmfc\lib\x86" }) -join ';') >> $env:GITHUB_ENV
-            Write-Host "atlmfc: $(($atlmfc | ForEach-Object { $_.FullName }) -join ';')"
-          }
-          else {
-            $instances = & $vswhere -all -products * -format json | ConvertFrom-Json
-            Write-Host "##[error]atlmfc not found. Available instances:"
-            $instances | ForEach-Object { Write-Host "  $($_.installationVersion) $($_.installationPath)" }
-            throw "atlmfc not found under $vs\VC\Tools\MSVC - install the VC.ATL component"
-          }
-
       - name: Restore NuGet packages
         shell: pwsh
         working-directory: ${{ steps.bootstrap.outputs.build_dir }}

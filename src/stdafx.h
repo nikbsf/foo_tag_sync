@@ -1,4 +1,5 @@
-#include "../../ATLHelpers/ATLHelpers.h"
+#include "../SDK/foobar2000.h"
+#include "../helpers/helpers.h"
 
 #include <memory>
 #include <vector>
