@@ -8,7 +8,10 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    # windows-latest is a moving alias (now windows-2025-vs2026, which ships
+    # only VS2026 whose v143 toolset lacks ATL). windows-2025 has VS2022 17.x
+    # with a v143 toolset and a matching ATL component.
+    runs-on: windows-2025
     steps:
       - uses: actions/checkout@v4
 
@@ -17,20 +20,23 @@ jobs:
         shell: pwsh
         run: ./bootstrap.ps1
 
-      # Pin the build to VS2022: v143 (14.4x) and its ATL are aligned there.
-      # vswhere -latest would pick VS2026, whose v143 toolset lacks atlmfc,
-      # breaking ATLHelpers with C1083 (see actions/runner-images#9873).
       - name: Locate VS2022 toolchain
         shell: pwsh
         run: |
           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          $vs = & $vswhere -latest -version "[17.0,18.0)" -property installationPath
-          if (-not $vs) { throw "Visual Studio 2022 (17.x) not found on the image" }
-          "MSBUILD=$vs\MSBuild\Current\Bin\MSBuild.exe" >> $env:GITHUB_ENV
-          Write-Host "VS2022: $vs"
-          # Insurance against #9873 (atlmfc missing from the default include path):
-          # cl.exe also honors the INCLUDE/LIB environment variables.
-          $atlmfc = Get-ChildItem "$vs\VC\Tools\MSVC" -Directory |
+          $instances = & $vswhere -all -products * -format json | ConvertFrom-Json
+          $vs = $instances | Where-Object { $_.installationVersion -like '17.*' } | Select-Object -First 1
+          if (-not $vs) {
+            Write-Host "##[error]No Visual Studio 2022 instance found. Available instances:"
+            $instances | ForEach-Object { Write-Host "  $($_.installationVersion) $($_.installationPath)" }
+            throw "Visual Studio 2022 (17.x) not found on the image"
+          }
+          $vsPath = $vs.installationPath
+          "MSBUILD=$vsPath\MSBuild\Current\Bin\MSBuild.exe" >> $env:GITHUB_ENV
+          Write-Host "VS2022: $vsPath ($($vs.installationVersion))"
+          # Insurance against runner-images#9873 (atlmfc missing from the default
+          # include path): cl.exe also honors the INCLUDE/LIB environment variables.
+          $atlmfc = Get-ChildItem "$vsPath\VC\Tools\MSVC" -Directory |
                     Where-Object { Test-Path "$($_.FullName)\atlmfc\include\atlbase.h" }
           if ($atlmfc) {
             "INCLUDE=" + (($atlmfc | ForEach-Object { "$($_.FullName)\atlmfc\include" }) -join ';') >> $env:GITHUB_ENV
@@ -38,7 +44,7 @@ jobs:
             Write-Host "atlmfc: $(($atlmfc | ForEach-Object { $_.FullName }) -join ';')"
           }
           else {
-            Write-Host "##[warning]atlmfc not found under $vs\VC\Tools\MSVC"
+            Write-Host "##[warning]atlmfc not found under $vsPath\VC\Tools\MSVC"
           }
 
       - name: Restore NuGet packages
