@@ -20,6 +20,22 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
 
+      # Workaround for actions/runner-images#9873: the ATL headers exist on the
+      # image but are missing from the compiler's default include path.
+      - name: Add atlmfc to INCLUDE/LIB
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
+          $dirs = Get-ChildItem "$vs\VC\Tools\MSVC" -Directory |
+                  Where-Object { Test-Path "$($_.FullName)\atlmfc\include\atlbase.h" }
+          if (-not $dirs) { throw "atlmfc not found under $vs\VC\Tools\MSVC - install the VC.ATL component" }
+          $inc = ($dirs | ForEach-Object { "$($_.FullName)\atlmfc\include" }) -join ';'
+          $lib = ($dirs | ForEach-Object { "$($_.FullName)\atlmfc\lib\x86" }) -join ';'
+          "INCLUDE=$env:INCLUDE;$inc" >> $env:GITHUB_ENV
+          "LIB=$env:LIB;$lib" >> $env:GITHUB_ENV
+          Write-Host "atlmfc include: $inc"
+          Write-Host "atlmfc lib: $lib"
+
       - name: Restore NuGet packages
         shell: pwsh
         working-directory: ${{ steps.bootstrap.outputs.build_dir }}
