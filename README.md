@@ -2,7 +2,7 @@
 
 ## Building
 
-Prerequisites (Windows): Visual Studio 2019/2022 with the "Desktop development with C++" workload (v142 toolset), NuGet (`nuget.exe`), PowerShell 5.1+.
+Prerequisites (Windows): Visual Studio 2022 with the "Desktop development with C++" workload (v143 toolset), NuGet (`nuget.exe`), PowerShell 5.1+.
 
 ### 1. Bootstrap the SDK layout
 
@@ -12,7 +12,7 @@ The solution references the foobar2000 SDK via relative paths. Run from the repo
 .\bootstrap.ps1
 ```
 
-The script unpacks the pinned SDK (`vendor\SDK-2015-08-03.zip`) and retargets its projects to the v142 toolset. The resulting layout (relative to the repository):
+The script unpacks the pinned SDK (`vendor\SDK-2015-08-03.zip`) and retargets its projects to the v143 toolset. The resulting layout (relative to the repository):
 
 ```
 <repo-parent-parent>\
